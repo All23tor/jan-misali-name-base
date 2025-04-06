@@ -1,6 +1,7 @@
-#include "BaseName.hpp"
+#include "BaseName2.hpp"
 #include <iostream>
 #include <print>
+#include <set>
 
 static constexpr std::string_view help_text =
     "a base-neutral system for naming numbering systems\n\n"
@@ -85,15 +86,14 @@ int main(int argc, const char** argv) {
 
   for (const auto& [start, end] : ranges) {
     for (Number i = start; i <= end; ++i) {
-      auto base = base_name(i);
       std::string line;
       if (show_values)
-        line += std::to_string(base.val) + " | ";
-      line += base.name;
+        line += std::to_string(i) + " | ";
+      line += base_name(i);
       if (show_prefix)
-        line += " | " + base.prefix;
+        line += " | " /* + base_prefix(i)*/;
       if (show_roots)
-        line += " | " + std::to_string(base.roots);
+        line += " | " + std::to_string(base_roots(i));
       std::println("{}", line);
     }
   }
