@@ -24,21 +24,27 @@ auto get_factorization(Number n) {
 
   Number best_number = 1;
   Number best_root_count = std::numeric_limits<Number>::max();
-  for (Number i = std::ceil(std::sqrt(n)); i >= 2; --i) {
+  for (Number i = std::floor(std::sqrt(n)); i >= 2; --i) {
     if (n % i)
       continue;
-    Number root_count = get_factorization(i)->second.roots +
-                        get_factorization(n / i)->second.roots;
-    if (root_count < best_root_count) {
-      best_root_count = root_count;
-      best_number = i;
+    auto left = get_factorization(i)->second;
+    auto right = get_factorization(n / i)->second;
+    Number root_count = left.roots + right.roots;
+    if (root_count > best_root_count)
+      continue;
+    if (root_count == best_root_count) {
+      if ((n / i - i) > (n / best_number - best_number))
+        continue;
     }
+
+    best_root_count = root_count;
+    best_number = i;
   }
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
 
 static const std::map<Number, std::pair<const char*, const char*>> affixes{
-    {0, {"null", "nullary"}},      {1, {"mono", "unary"}},
+    {0, {"nullary", "null"}},      {1, {"unary", "mono"}},
     {2, {"binary", "bi"}},         {3, {"trinary", "tri"}},
     {4, {"quaternary", "tetra"}},  {5, {"quinary", "penta"}},
     {6, {"seximal", "hexa"}},      {7, {"septimal", "hepta"}},
