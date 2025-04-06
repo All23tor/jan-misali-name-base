@@ -2,6 +2,7 @@
 #include <iostream>
 #include <print>
 #include <set>
+#include <vector>
 
 static constexpr std::string_view help_text =
     "a base-neutral system for naming numbering systems\n\n"
@@ -74,10 +75,9 @@ int main(int argc, const char** argv) {
   } catch (const std::invalid_argument& ia) {
     std::println(std::cerr, "Unable to parse {} using {}", ia.what(),
                  use_decimal ? "decimal" : "seximal");
-    if (use_decimal)
-      std::println(std::cerr, "Use '+h' to show help");
-    else
-      println(std::cerr, "Use '+d' to use decimal");
+    if (!use_decimal)
+      println(std::cerr, "Use '+d' if you intended to use decimal");
+    std::println(std::cerr, "Use '+h' to show help");
     return -1;
   } catch (const std::out_of_range& oor) {
     std::println(std::cerr, "{} out of range", oor.what());
@@ -91,7 +91,7 @@ int main(int argc, const char** argv) {
         line += std::to_string(i) + " | ";
       line += base_name(i);
       if (show_prefix)
-        line += " | " /* + base_prefix(i)*/;
+        line += " | " + base_prefix(i);
       if (show_roots)
         line += " | " + std::to_string(base_roots(i));
       std::println("{}", line);

@@ -2,7 +2,6 @@
 #include <limits>
 #include <map>
 #include <string>
-#include <vector>
 
 namespace {
 using Number = long long;
@@ -13,10 +12,10 @@ struct factorization {
 };
 
 std::map<Number, const factorization> factors = {
-    {1, {0, 1}},   {2, {1, 2}},   {3, {1, 3}},    {4, {1, 4}},   {5, {1, 5}},
-    {6, {1, 6}},   {7, {1, 7}},   {8, {1, 8}},    {9, {1, 9}},   {10, {1, 10}},
-    {11, {1, 11}}, {12, {1, 12}}, {13, {1, 13}},  {16, {1, 16}}, {17, {1, 17}},
-    {20, {1, 20}}, {36, {1, 36}}, {100, {1, 100}}};
+    {0, {0, 0}},   {1, {0, 1}},   {2, {1, 2}},   {3, {1, 3}},    {4, {1, 4}},
+    {5, {1, 5}},   {6, {1, 6}},   {7, {1, 7}},   {8, {1, 8}},    {9, {1, 9}},
+    {10, {1, 10}}, {11, {1, 11}}, {12, {1, 12}}, {13, {1, 13}},  {16, {1, 16}},
+    {17, {1, 17}}, {20, {1, 20}}, {36, {1, 36}}, {100, {1, 100}}};
 
 // Returns the smallest of the best pair of factors
 auto get_factorization(Number n) {
@@ -38,30 +37,65 @@ auto get_factorization(Number n) {
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
 
-void insert_factors(std::vector<Number>& v, Number n) {
+static const std::map<Number, std::pair<const char*, const char*>> affixes{
+    {0, {"", "nullary"}},          {1, {"", "unary"}},
+    {2, {"binary", "bi"}},         {3, {"trinary", "tri"}},
+    {4, {"quaternary", "tetra"}},  {5, {"quinary", "penta"}},
+    {6, {"seximal", "hexa"}},      {7, {"septimal", "hepta"}},
+    {8, {"octal", "octo"}},        {9, {"nonary", "enna"}},
+    {10, {"gesimal", "deca"}},     {11, {"elevenary", "leva"}},
+    {12, {"dozenal", "doza"}},     {13, {"ker's dozenal", "baker"}},
+    {16, {"hex", "tesser"}},       {17, {"suboptimal", "mal"}},
+    {20, {"vigesimal", "icosi"}},  {36, {"niftimal", "feta"}},
+    {100, {"centesimal", "hecto"}}};
+
+const char* to_suffix(Number n) {
+  return affixes.at(n).first;
+}
+
+const char* to_prefix(Number n) {
+  return affixes.at(n).second;
+}
+
+void insert_factors_prefix(std::string& s, Number n) {
   Number factor = get_factorization(n)->second.best_factor;
   if (factor == n) // n is a root
-    v.push_back(factor);
+    s.append(to_prefix(factor));
   else if (factor == 1) { // n is prime
-    v.push_back(1);
-    insert_factors(v, n - 1);
-    v.push_back(-1);
+    s.append("hen");
+    insert_factors_prefix(s, n - 1);
+    s.append("sna");
   } else { // n is composite
-    insert_factors(v, factor);
-    insert_factors(v, n / factor);
+    insert_factors_prefix(s, factor);
+    insert_factors_prefix(s, n / factor);
   }
 }
+
+void insert_factors_suffix(std::string& s, Number n) {
+  Number factor = get_factorization(n)->second.best_factor;
+  if (factor == n) // n is a root
+    s.append(to_suffix(factor));
+  else if (factor == 1) { // n is prime
+    s.append("un");
+    insert_factors_suffix(s, n - 1);
+  } else { // n is composite
+    insert_factors_prefix(s, factor);
+    insert_factors_suffix(s, n / factor);
+  }
+}
+
 } // namespace
 
-inline std::string base_name(long long n) {
-  std::string ans;
-  std::vector<long long> factors;
-  insert_factors(factors, n);
-  for (auto&& e : factors) {
-    ans += std::to_string(e);
-    ans += ' ';
-  }
-  return ans;
+inline std::string base_name(Number n) {
+  std::string s;
+  insert_factors_suffix(s, n);
+  return s;
+}
+
+inline std::string base_prefix(Number n) {
+  std::string s;
+  insert_factors_prefix(s, n);
+  return s;
 }
 
 inline long long base_roots(long long n) {
