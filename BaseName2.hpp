@@ -38,7 +38,7 @@ auto get_factorization(Number n) {
 };
 
 static const std::map<Number, std::pair<const char*, const char*>> affixes{
-    {0, {"", "nullary"}},          {1, {"", "unary"}},
+    {0, {"null", "nullary"}},      {1, {"mono", "unary"}},
     {2, {"binary", "bi"}},         {3, {"trinary", "tri"}},
     {4, {"quaternary", "tetra"}},  {5, {"quinary", "penta"}},
     {6, {"seximal", "hexa"}},      {7, {"septimal", "hepta"}},
@@ -57,14 +57,25 @@ const char* to_prefix(Number n) {
   return affixes.at(n).second;
 }
 
+void append_and_format(std::string& left, const char* right) {
+  static constexpr std::string_view vowels = "aeiou";
+  if (left.back() == 'i' && (right[0] == 'i' || right[0] == 'u')) {
+    right++;
+  } else if ((left.back() == 'a' || left.back() == 'o') &&
+             vowels.contains(right[0])) {
+    left.pop_back();
+  }
+  left.append(right);
+}
+
 void insert_factors_prefix(std::string& s, Number n) {
   Number factor = get_factorization(n)->second.best_factor;
   if (factor == n) // n is a root
-    s.append(to_prefix(factor));
+    append_and_format(s, to_prefix(factor));
   else if (factor == 1) { // n is prime
-    s.append("hen");
+    append_and_format(s, "hen");
     insert_factors_prefix(s, n - 1);
-    s.append("sna");
+    append_and_format(s, "sna");
   } else { // n is composite
     insert_factors_prefix(s, factor);
     insert_factors_prefix(s, n / factor);
@@ -74,9 +85,9 @@ void insert_factors_prefix(std::string& s, Number n) {
 void insert_factors_suffix(std::string& s, Number n) {
   Number factor = get_factorization(n)->second.best_factor;
   if (factor == n) // n is a root
-    s.append(to_suffix(factor));
+    append_and_format(s, to_suffix(factor));
   else if (factor == 1) { // n is prime
-    s.append("un");
+    append_and_format(s, "un");
     insert_factors_suffix(s, n - 1);
   } else { // n is composite
     insert_factors_prefix(s, factor);
