@@ -105,12 +105,22 @@ void insert_factors_suffix(std::string& s, Number n) {
 
 inline std::string base_name(Number n) {
   std::string s;
+  if (n < 0)          // Doing this before insertion may merge the 'a'
+    s.append("nega"); // This is intentional, as BASEOFF does the same
+  n = std::abs(n);
   insert_factors_suffix(s, n);
+  if (n == 10)
+    s.replace(s.rfind("ges"), 3, "dec");
+  else if (n == 13)
+    s.insert(s.rfind("ker"), "ba");
   return s;
 }
 
 inline std::string base_prefix(Number n) {
   std::string s;
+  if (n < 0)          // Doing this before insertion may merge the 'a'
+    s.append("nega"); // This is intentional, as BASEOFF does the same
+  n = std::abs(n);
   insert_factors_prefix(s, n);
   return s;
 }
