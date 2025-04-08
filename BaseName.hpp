@@ -40,6 +40,11 @@ auto get_factorization(Number n) {
     best_root_count = root_count;
     best_number = i;
   }
+
+  if (best_number == 1) { // n is prime
+    best_root_count = get_factorization(n - 1)->second.roots;
+  }
+
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
 
