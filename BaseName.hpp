@@ -46,30 +46,20 @@ auto get_factorization(Number n) {
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
 
-struct affix {
-  const char* prefix;
-  const char* suffix;
-};
+const std::unordered_map<Number, const char*> suffixes{
+    {0, "nullary"},     {1, "unary"},          {2, "binary"},
+    {3, "trinary"},     {4, "quaternary"},     {5, "quinary"},
+    {6, "seximal"},     {7, "septimal"},       {8, "octal"},
+    {9, "nonary"},      {10, "gesimal"},       {11, "elevenary"},
+    {12, "dozenal"},    {13, "ker's dozenal"}, {16, "hex"},
+    {17, "suboptimal"}, {20, "vigesimal"},     {36, "niftimal"},
+    {100, "centesimal"}};
 
-const std::unordered_map<Number, affix> affixes{
-    {0, {"nullary", "null"}},      {1, {"unary", "mono"}},
-    {2, {"binary", "bi"}},         {3, {"trinary", "tri"}},
-    {4, {"quaternary", "tetra"}},  {5, {"quinary", "penta"}},
-    {6, {"seximal", "hexa"}},      {7, {"septimal", "hepta"}},
-    {8, {"octal", "octo"}},        {9, {"nonary", "enna"}},
-    {10, {"gesimal", "deca"}},     {11, {"elevenary", "leva"}},
-    {12, {"dozenal", "doza"}},     {13, {"ker's dozenal", "baker"}},
-    {16, {"hex", "tesser"}},       {17, {"suboptimal", "mal"}},
-    {20, {"vigesimal", "icosi"}},  {36, {"niftimal", "feta"}},
-    {100, {"centesimal", "hecto"}}};
-
-const char* to_suffix(Number n) {
-  return affixes.at(n).suffix;
-}
-
-const char* to_prefix(Number n) {
-  return affixes.at(n).prefix;
-}
+const std::unordered_map<Number, const char*> prefixes{
+    {0, "null"},  {1, "mono"},   {2, "bi"},    {3, "tri"},    {4, "tetra"},
+    {5, "penta"}, {6, "hexa"},   {7, "hepta"}, {8, "octo"},   {9, "enna"},
+    {10, "deca"}, {11, "leva"},  {12, "doza"}, {13, "baker"}, {16, "tesser"},
+    {17, "mal"},  {20, "icosi"}, {36, "feta"}, {100, "hecto"}};
 
 void append_and_format(std::string& left, const char* right) {
   static constexpr std::string_view vowels = "aeiou";
@@ -85,7 +75,7 @@ void append_and_format(std::string& left, const char* right) {
 void insert_factors_prefix(std::string& s, Number n) {
   Number factor = get_factorization(n)->second.best_factor;
   if (factor == n) // n is a root
-    append_and_format(s, to_prefix(factor));
+    append_and_format(s, prefixes.at(factor));
   else if (factor == 1) { // n is prime
     append_and_format(s, "hen");
     insert_factors_prefix(s, n - 1);
@@ -99,7 +89,7 @@ void insert_factors_prefix(std::string& s, Number n) {
 void insert_factors_suffix(std::string& s, Number n) {
   Number factor = get_factorization(n)->second.best_factor;
   if (factor == n) // n is a root
-    append_and_format(s, to_suffix(factor));
+    append_and_format(s, suffixes.at(factor));
   else if (factor == 1) { // n is prime
     append_and_format(s, "un");
     insert_factors_suffix(s, n - 1);
