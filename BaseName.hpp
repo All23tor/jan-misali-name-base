@@ -46,7 +46,12 @@ auto get_factorization(Number n) {
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
 
-static const std::unordered_map<Number, std::pair<const char*, const char*>> affixes{
+struct affix {
+  const char* prefix;
+  const char* suffix;
+};
+
+const std::unordered_map<Number, affix> affixes{
     {0, {"nullary", "null"}},      {1, {"unary", "mono"}},
     {2, {"binary", "bi"}},         {3, {"trinary", "tri"}},
     {4, {"quaternary", "tetra"}},  {5, {"quinary", "penta"}},
@@ -59,11 +64,11 @@ static const std::unordered_map<Number, std::pair<const char*, const char*>> aff
     {100, {"centesimal", "hecto"}}};
 
 const char* to_suffix(Number n) {
-  return affixes.at(n).first;
+  return affixes.at(n).suffix;
 }
 
 const char* to_prefix(Number n) {
-  return affixes.at(n).second;
+  return affixes.at(n).prefix;
 }
 
 void append_and_format(std::string& left, const char* right) {
