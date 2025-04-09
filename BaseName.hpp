@@ -32,18 +32,16 @@ auto get_factorization(Number n) {
     Number root_count = left.roots + right.roots;
     if (root_count > best_root_count)
       continue;
-    if (root_count == best_root_count) {
-      if ((n / i - i) > (n / best_number - best_number))
-        continue;
-    }
+    if (root_count == best_root_count &&
+        (n / i - i) > (n / best_number - best_number))
+      continue;
 
     best_root_count = root_count;
     best_number = i;
   }
 
-  if (best_number == 1) { // n is prime
+  if (best_number == 1) // n is prime
     best_root_count = get_factorization(n - 1)->second.roots;
-  }
 
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
