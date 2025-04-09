@@ -46,21 +46,6 @@ auto get_factorization(Number n) {
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
 
-const std::unordered_map<Number, const char*> suffixes{
-    {0, "nullary"},     {1, "unary"},          {2, "binary"},
-    {3, "trinary"},     {4, "quaternary"},     {5, "quinary"},
-    {6, "seximal"},     {7, "septimal"},       {8, "octal"},
-    {9, "nonary"},      {10, "gesimal"},       {11, "elevenary"},
-    {12, "dozenal"},    {13, "ker's dozenal"}, {16, "hex"},
-    {17, "suboptimal"}, {20, "vigesimal"},     {36, "niftimal"},
-    {100, "centesimal"}};
-
-const std::unordered_map<Number, const char*> prefixes{
-    {0, "null"},  {1, "mono"},   {2, "bi"},    {3, "tri"},    {4, "tetra"},
-    {5, "penta"}, {6, "hexa"},   {7, "hepta"}, {8, "octo"},   {9, "enna"},
-    {10, "deca"}, {11, "leva"},  {12, "doza"}, {13, "baker"}, {16, "tesser"},
-    {17, "mal"},  {20, "icosi"}, {36, "feta"}, {100, "hecto"}};
-
 void append_and_format(std::string& left, const char* right) {
   static constexpr std::string_view vowels = "aeiou";
   if (left.back() == 'i' && (right[0] == 'i' || right[0] == 'u')) {
@@ -73,6 +58,12 @@ void append_and_format(std::string& left, const char* right) {
 }
 
 void insert_factors_prefix(std::string& s, Number n) {
+  static const std::unordered_map<Number, const char*> prefixes{
+      {0, "null"},  {1, "mono"},   {2, "bi"},    {3, "tri"},    {4, "tetra"},
+      {5, "penta"}, {6, "hexa"},   {7, "hepta"}, {8, "octo"},   {9, "enna"},
+      {10, "deca"}, {11, "leva"},  {12, "doza"}, {13, "baker"}, {16, "tesser"},
+      {17, "mal"},  {20, "icosi"}, {36, "feta"}, {100, "hecto"}};
+
   Number factor = get_factorization(n)->second.best_factor;
   if (factor == n) // n is a root
     append_and_format(s, prefixes.at(factor));
@@ -87,6 +78,15 @@ void insert_factors_prefix(std::string& s, Number n) {
 }
 
 void insert_factors_suffix(std::string& s, Number n) {
+  static const std::unordered_map<Number, const char*> suffixes{
+      {0, "nullary"},     {1, "unary"},          {2, "binary"},
+      {3, "trinary"},     {4, "quaternary"},     {5, "quinary"},
+      {6, "seximal"},     {7, "septimal"},       {8, "octal"},
+      {9, "nonary"},      {10, "gesimal"},       {11, "elevenary"},
+      {12, "dozenal"},    {13, "ker's dozenal"}, {16, "hex"},
+      {17, "suboptimal"}, {20, "vigesimal"},     {36, "niftimal"},
+      {100, "centesimal"}};
+
   Number factor = get_factorization(n)->second.best_factor;
   if (factor == n) // n is a root
     append_and_format(s, suffixes.at(factor));
