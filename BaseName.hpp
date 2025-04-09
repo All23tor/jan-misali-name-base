@@ -1,7 +1,7 @@
 #include <cmath>
 #include <limits>
-#include <map>
 #include <string>
+#include <unordered_map>
 
 namespace {
 using Number = long long;
@@ -11,7 +11,7 @@ struct factorization {
   Number best_factor;
 };
 
-std::map<Number, const factorization> factors = {
+std::unordered_map<Number, const factorization> factors = {
     {0, {0, 0}},   {1, {0, 1}},   {2, {1, 2}},   {3, {1, 3}},    {4, {1, 4}},
     {5, {1, 5}},   {6, {1, 6}},   {7, {1, 7}},   {8, {1, 8}},    {9, {1, 9}},
     {10, {1, 10}}, {11, {1, 11}}, {12, {1, 12}}, {13, {1, 13}},  {16, {1, 16}},
@@ -46,7 +46,7 @@ auto get_factorization(Number n) {
   return factors.insert({n, {best_root_count, best_number}}).first;
 };
 
-static const std::map<Number, std::pair<const char*, const char*>> affixes{
+static const std::unordered_map<Number, std::pair<const char*, const char*>> affixes{
     {0, {"nullary", "null"}},      {1, {"unary", "mono"}},
     {2, {"binary", "bi"}},         {3, {"trinary", "tri"}},
     {4, {"quaternary", "tetra"}},  {5, {"quinary", "penta"}},
