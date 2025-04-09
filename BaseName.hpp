@@ -27,9 +27,8 @@ auto get_factorization(Number n) {
   for (Number i = std::floor(std::sqrt(n)); i >= 2; --i) {
     if (n % i)
       continue;
-    auto left = get_factorization(i)->second;
-    auto right = get_factorization(n / i)->second;
-    Number root_count = left.roots + right.roots;
+    Number root_count = get_factorization(i)->second.roots +
+                        get_factorization(n / i)->second.roots;
     if (root_count > best_root_count)
       continue;
     if (root_count == best_root_count &&
