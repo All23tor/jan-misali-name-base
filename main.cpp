@@ -83,7 +83,6 @@ int main(int argc, const char** argv) {
       auto error2 = std::from_chars(separator + 2, end, second, base).ec;
       error = (error1 == std::errc{}) ? error2 : error1;
     }
-    ranges.emplace_back(first, second);
 
     if (error == std::errc::invalid_argument) {
       std::println(std::cerr, "Unable to parse {} using {}", number,
@@ -97,6 +96,8 @@ int main(int argc, const char** argv) {
       std::println(std::cerr, "{} out of range", number);
       return -1;
     }
+    
+    ranges.emplace_back(first, second);
   }
 
   for (const auto& [start, end] : ranges) {
