@@ -10,7 +10,7 @@ static constexpr std::string_view help_text =
     "Usage: name-base  [OPTIONS]... [NUMBER]...\n\n"
     "NUMBER arguments must be of the following forms:\n"
     "\tn\tSingle number\n"
-    "\tn..m\tInclusive range\n"
+    "\tn..m\tRight-open range\n"
     "By default it only displays the given NUMBERs base name.\n\n"
     "Options:\n"
     "\t+v\tDisplay NUMBER values\n"
@@ -100,9 +100,7 @@ int main(int argc, const char** argv) {
     ranges.emplace_back(first, second);
   }
 
-  for (const auto& [start, end] : ranges) {
-    for (Number i = start; i <= end; ++i) {
-      options.print(i);
-    }
-  }
+  for (auto& [start, end] : ranges)
+    while (start < end)
+      options.print(start++);
 }
