@@ -1,4 +1,5 @@
 #include "BaseName.hpp"
+#include <charconv>
 #include <iostream>
 #include <print>
 #include <set>
@@ -44,7 +45,7 @@ int main(int argc, const char** argv) {
   bool show_roots = options.contains('r');
   bool show_help = options.contains('h');
   bool use_decimal = options.contains('d');
-  int parse_base = use_decimal ? 10 : 6;
+  int base = use_decimal ? 10 : 6;
 
   if (show_help || argc < 2) {
     std::println(help_text);
@@ -52,36 +53,37 @@ int main(int argc, const char** argv) {
   }
 
   std::vector<std::pair<Number, Number>> ranges;
-  try {
-    for (const auto& argument : numbers) {
-      try {
-        auto separator_index = argument.find("..");
-        if (separator_index == argument.npos) {
-          Number val = std::stoll(std::string(argument), nullptr, parse_base);
-          ranges.emplace_back(val, val);
-        } else {
-          auto first = std::string(argument.substr(0, separator_index));
-          auto second = std::string(argument.substr(separator_index + 2));
-          auto start = std::stoll(first, nullptr, parse_base);
-          auto end = std::stoll(second, nullptr, parse_base);
-          ranges.emplace_back(start, end);
-        }
-      } catch (const std::invalid_argument&) {
-        throw std::invalid_argument(std::string(argument));
-      } catch (const std::out_of_range&) {
-        throw std::out_of_range(std::string(argument));
-      }
+  for (const auto& number : numbers) {
+    auto begin = number.data();
+    auto end = begin + number.size();
+    auto separator_index = number.find("..");
+    auto separator = begin + separator_index;
+
+    std::errc error{};
+    Number first{};
+    Number second{};
+    if (separator_index == number.npos) {
+      error = std::from_chars(begin, end, first, base).ec;
+      second = first;
+    } else {
+      auto error1 = std::from_chars(begin, separator, first, base).ec;
+      auto error2 = std::from_chars(separator + 2, end, second, base).ec;
+      error = (error1 == std::errc{}) ? error2 : error1;
     }
-  } catch (const std::invalid_argument& ia) {
-    std::println(std::cerr, "Unable to parse {} using {}", ia.what(),
-                 use_decimal ? "decimal" : "seximal");
-    if (!use_decimal)
-      println(std::cerr, "Use '+d' if you intended to use decimal");
-    std::println(std::cerr, "Use '+h' to show help");
-    return -1;
-  } catch (const std::out_of_range& oor) {
-    std::println(std::cerr, "{} out of range", oor.what());
-    return -1;
+    ranges.emplace_back(first, second);
+
+    if (error == std::errc::invalid_argument) {
+      std::println(std::cerr, "Unable to parse {} using {}", number,
+                   use_decimal ? "decimal" : "seximal");
+      if (!use_decimal)
+        std::println(std::cerr, "Use '+d' if you intended to use decimal");
+      std::println(std::cerr, "Use '+h' to show help");
+      return -1;
+
+    } else if (error == std::errc::result_out_of_range) {
+      std::println(std::cerr, "{} out of range", number);
+      return -1;
+    }
   }
 
   for (const auto& [start, end] : ranges) {
