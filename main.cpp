@@ -36,9 +36,10 @@ struct Options {
   }
 
   void print(Number n) {
-    std::println("{}{}{}{}", show_values ? std::to_string(n) + " | " : "",
-                 base_name(n), show_prefix ? " | " + base_prefix(n) : "",
-                 show_roots ? " | " + std::to_string(base_roots(n)) : "");
+    auto value = show_values ? std::to_string(n) + " | " : "";
+    auto prefix = show_prefix ? " | " + base_prefix(n) : "";
+    auto roots = show_roots ? " | " + std::to_string(base_roots(n)) : "";
+    std::println("{}{}{}{}", value, base_name(n), prefix, roots);
   }
 };
 
@@ -91,7 +92,6 @@ int main(int argc, const char** argv) {
         std::println(std::cerr, "Use '+d' if you intended to use decimal");
       std::println(std::cerr, "Use '+h' to show help");
       return -1;
-
     } else if (error == std::errc::result_out_of_range) {
       std::println(std::cerr, "{} out of range", number);
       return -1;
