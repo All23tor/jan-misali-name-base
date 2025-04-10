@@ -20,34 +20,47 @@ static constexpr std::string_view help_text =
     "\t+d\tDecimal mode (by default use seximal)\n"
     "\t+h\tDisplays this help text";
 
+struct Options {
+  bool show_values;
+  bool show_prefix;
+  bool show_roots;
+  bool show_help;
+  bool use_decimal;
+
+  Options() = default;
+  Options(const std::set<char>& options) {
+    show_values = options.contains('v');
+    show_prefix = options.contains('p');
+    show_roots = options.contains('r');
+    show_help = options.contains('h');
+    use_decimal = options.contains('d');
+  }
+};
+
 struct Arguments {
-  std::set<char> options;
+  Options options;
   std::vector<std::string_view> numbers;
 };
 
 static Arguments select_arguments(int argc, const char** argv) {
-  Arguments arguments;
+  std::set<char> options;
+  std::vector<std::string_view> numbers;
   for (int i = 1; i < argc; ++i) {
-    const std::string_view argument = argv[i];
+    const std::string_view& argument = argv[i];
     if (argument.starts_with('+')) {
       for (char c : argument.substr(1))
-        arguments.options.insert(c);
+        options.insert(c);
     } else
-      arguments.numbers.push_back(argument);
+      numbers.push_back(argument);
   }
-  return arguments;
+  return {Options(options), std::move(numbers)};
 }
 
 int main(int argc, const char** argv) {
   auto [options, numbers] = select_arguments(argc, argv);
-  bool show_values = options.contains('v');
-  bool show_prefix = options.contains('p');
-  bool show_roots = options.contains('r');
-  bool show_help = options.contains('h');
-  bool use_decimal = options.contains('d');
-  int base = use_decimal ? 10 : 6;
+  int base = options.use_decimal ? 10 : 6;
 
-  if (show_help || argc < 2) {
+  if (options.show_help || argc < 2) {
     std::println(help_text);
     return 0;
   }
@@ -74,8 +87,8 @@ int main(int argc, const char** argv) {
 
     if (error == std::errc::invalid_argument) {
       std::println(std::cerr, "Unable to parse {} using {}", number,
-                   use_decimal ? "decimal" : "seximal");
-      if (!use_decimal)
+                   options.use_decimal ? "decimal" : "seximal");
+      if (!options.use_decimal)
         std::println(std::cerr, "Use '+d' if you intended to use decimal");
       std::println(std::cerr, "Use '+h' to show help");
       return -1;
@@ -89,12 +102,12 @@ int main(int argc, const char** argv) {
   for (const auto& [start, end] : ranges) {
     for (Number i = start; i <= end; ++i) {
       std::string line;
-      if (show_values)
+      if (options.show_values)
         line += std::to_string(i) + " | ";
       line += base_name(i);
-      if (show_prefix)
+      if (options.show_prefix)
         line += " | " + base_prefix(i);
-      if (show_roots)
+      if (options.show_roots)
         line += " | " + std::to_string(base_roots(i));
       std::println("{}", line);
     }
