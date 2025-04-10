@@ -34,6 +34,12 @@ struct Options {
     show_help = options.contains('h');
     use_decimal = options.contains('d');
   }
+
+  void print(Number n) {
+    std::println("{}{}{}{}", show_values ? std::to_string(n) + " | " : "",
+                 base_name(n), show_prefix ? " | " + base_prefix(n) : "",
+                 show_roots ? " | " + std::to_string(base_roots(n)) : "");
+  }
 };
 
 static auto select_arguments(int argc, const char** argv) {
@@ -96,10 +102,7 @@ int main(int argc, const char** argv) {
 
   for (const auto& [start, end] : ranges) {
     for (Number i = start; i <= end; ++i) {
-      std::println(
-          "{}{}{}{}", options.show_values ? std::to_string(i) + " | " : "",
-          base_name(i), options.show_prefix ? " | " + base_prefix(i) : "",
-          options.show_roots ? " | " + std::to_string(base_roots(i)) : "");
+      options.print(i);
     }
   }
 }
