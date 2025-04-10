@@ -27,7 +27,6 @@ struct Options {
   bool show_help;
   bool use_decimal;
 
-  Options() = default;
   Options(const std::set<char>& options) {
     show_values = options.contains('v');
     show_prefix = options.contains('p');
@@ -37,12 +36,7 @@ struct Options {
   }
 };
 
-struct Arguments {
-  Options options;
-  std::vector<std::string_view> numbers;
-};
-
-static Arguments select_arguments(int argc, const char** argv) {
+static auto select_arguments(int argc, const char** argv) {
   std::set<char> options;
   std::vector<std::string_view> numbers;
   for (int i = 1; i < argc; ++i) {
@@ -53,7 +47,7 @@ static Arguments select_arguments(int argc, const char** argv) {
     } else
       numbers.push_back(argument);
   }
-  return {Options(options), std::move(numbers)};
+  return std::pair{Options(options), std::move(numbers)};
 }
 
 int main(int argc, const char** argv) {
@@ -96,21 +90,16 @@ int main(int argc, const char** argv) {
       std::println(std::cerr, "{} out of range", number);
       return -1;
     }
-    
+
     ranges.emplace_back(first, second);
   }
 
   for (const auto& [start, end] : ranges) {
     for (Number i = start; i <= end; ++i) {
-      std::string line;
-      if (options.show_values)
-        line += std::to_string(i) + " | ";
-      line += base_name(i);
-      if (options.show_prefix)
-        line += " | " + base_prefix(i);
-      if (options.show_roots)
-        line += " | " + std::to_string(base_roots(i));
-      std::println("{}", line);
+      std::println(
+          "{}{}{}{}", options.show_values ? std::to_string(i) + " | " : "",
+          base_name(i), options.show_prefix ? " | " + base_prefix(i) : "",
+          options.show_roots ? " | " + std::to_string(base_roots(i)) : "");
     }
   }
 }
